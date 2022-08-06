@@ -542,7 +542,504 @@ computed:{
 }
 ```
 
+## 监视属性
 
+1. 当被监视的属性变化时，回调函数自动调用，进行相关操作
+2. 监视的属性必须存在，才能进行监视
+3. 监视的两种写法：
+   * `new Vue` 时传入 `watch` 配置
+   * 通过 `vm.$watch` 监视
+
+### 基本使用
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>监视属性</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <div>
+            <h2>今天天气很{{info}}</h2>
+            <button @click="change">点击切换天气</button>
+        </div>
+    </div>
+    <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                ishot:true,
+            },
+            methods: {
+                change(){
+                    this.ishot = !this.ishot
+                }
+            },
+            computed:{
+                info(){
+                    return this.ishot ? '炎热' : '凉爽'
+                }
+            },
+            // 第一种写法
+            watch:{
+                ishot:{
+                    immediate:true, // 初始化时会被调用一次
+                    handler(newValue, oldValue){ // 当 ishot 被修改时会被调用
+                        console.log('ishot被修改', newValue, oldValue);
+                    }
+                }
+            }
+        })
+        // 第二种写法
+        vm.$watch('ishot', {
+            immediate:true,
+            handler(newValue, oldValue){
+                console.log('ishot被修改', newValue, oldValue);
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+### 深度监视
+
+1. `Vue` 中的 `watch` 默认不监测对象内部值的改变（一层）
+2. 配置 `deep:true` 可以监测对象内部值改变（多层）
+
+备注：
+
+1. `Vue` 自身可以监测到对象内部值的改变，但 `Vue` 提供的 `watch` 默认不可以
+2. 使用 `watch` 时根据数据的具体结构，决定是否采用深度监视
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>监视属性</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <div>
+            <h2 @click="number.a++">{{number.a}}</h2>
+            <h2 @click="number.b++">{{number.b}}</h2>
+        </div>
+    </div>
+    <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                number:{
+                    a:1,
+                    b:1
+                }
+            },
+            watch:{
+                // 多级结构时写字符串形式
+                'number.a':{
+                    handler(){
+                        console.log('a变化');
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+此时点击 `a` 会输出 a变化
+
+```js
+watch:{
+    number:{
+        deep:true, // 深度监视配置deep属性
+            handler(){
+            console.log('number变化');
+        }
+    }
+}
+```
+
+
+
+### 简写
+
+当 `wathch` 配置项只有 `handler` 时可以简写
+
+```js
+vm.$watch('ishot',function(newValue, oldValue){
+    console.log('ishot被修改', newValue, oldValue)
+})
+```
+
+```js
+watch:{
+    ishot(newValue, oldValue){
+        console.log('ishot被修改', newValue, oldValue);
+    }
+}
+```
+
+
+
+### Watch vs Computed
+
+**二者区别：**
+
+1. computed 能完成的功能，watch 都能完成
+2. watch 能完成的功能，computed 不一定能完成，例如：watch 可以进行异步操作
+
+**两个重要的小原则：**
+
+1. 被 `Vue` 管理的函数，最好写成普通函数，这样 `this` 的指向才是 `vm` 或组件实例对象
+2. 所有不被 `Vue` 管理的函数（定时器的回调函数、ajax的回调函数、promise的回调函数等），最好写成箭头函数，这样 `this` 的指向才是 `vm` 或 组件实例对象
+
+
+
+## 绑定class和style
+
+### class
+
+**基本写法**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绑定样式</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <style>
+        .happy{
+            background-color: red;
+        }
+
+        .sad{
+            background-color: blue;
+        }
+
+        .normal{
+            background-color: wheat;
+        }
+
+        .basic{
+            height: 100px;
+            width: 200px;
+            border: solid red 1px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="basic" :class="css" @click="change"></div>
+    </div>
+    <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                css:'normal'
+            },
+            methods: {
+                change(){
+                    styles = ['normal', 'sad', 'happy']
+                    this.css = styles[Math.floor(Math.random()*3)]
+                }
+            },
+        })
+    </script>
+</body>
+</html>
+```
+
+以上示例可以通过点击实现样式随机切换
+
+和绑定属性值类似
+
+`:class="xxx"`
+
+`xxx` 可填变量，数组或对象
+
+**数组：**
+
+```html
+<body>
+    <div id="root">
+        <div class="basic" :class="arr"></div>
+    </div>
+    <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                css:'normal',
+                arr:['normal', 'sad', 'happy'],
+            },
+            methods: {
+ 
+            },
+        })
+    </script>
+</body>
+```
+
+**对象：**
+
+```html
+<body>
+    <div id="root">
+        <div class="basic" :class="cssObj"></div>
+    </div>
+    <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                cssObj:{
+                    'normal':true, // 使用 normal样式
+                    'sad':false,
+                    'happy':false,
+                }
+            },
+        })
+    </script>
+</body>
+```
+
+### style
+
+**原始写法**
+
+```html
+<div class="basic" style="font-size: 50px;">你好</div>
+```
+
+绑定后
+
+```html
+<div class="basic" :style="{fontSize: size + 'px'}">你好</div>
+```
+
+![image-20220806103853268](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220806103855.png)
+
+![image-20220806103912733](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220806103914.png)
+
+**对象写法**
+
+```js
+data:{
+    styleObj:{
+        fontSize: '60px',
+        color: 'green',
+        backgroundColor: 'yellow'
+    }
+},
+```
+
+前面的 key 不能乱写，一个单词正常写，两个单词用 `-` 连接的需要将第二个单词首字母大写，然后去掉 `-` 
+
+
+
+![image-20220806104143764](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220806104145.png)
+
+style中也可以写 **数组**，但不常用
+
+
+
+## 条件渲染
+
+1. `v-if` 
+   * 写法： 
+     1. `v-if="表达式"`
+     2. `v-else-if="表达式"` 
+     3. `v-else="表达式"`
+   * 适用于：切换频率较低的场景
+   * 特点：不展示的 `DOM` 元素直接被移除
+   * 注意：`v-if` 可以和 `v-else-if` 、`v-else` 一起使用，但要求结构不能被打断
+2. `v-show`
+   * 写法：`v-show="表达式"`
+   * 适用于：切换频率较高的场景
+   * 特点：不展示的 `DOM` 元素未被移出，仅仅是使用样式隐藏掉
+3. 备注：使用 `v-if` 时，元素可能无法获取到，而使用 `v-show` 时一定可以获取到
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>条件渲染</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h1 v-show="0">你好</h1>
+        <h1 v-if="1 === 3">hello</h1>
+    </div>
+    <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+
+            },
+        })
+    </script>
+</body>
+</html>
+```
+
+
+
+![image-20220806110424753](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220806110426.png)
+
+
+
+## 列表渲染
+
+`v-for` 指令
+
+1. 用于展示列表数据
+2. 语法：`v-for="(item, index) in xxx" :key="yyy"`
+3. 可遍历：数组、对象、字符串（使用较少）、指定次数（使用较少）
+
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>列表渲染</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <ul>
+            <li v-for="(val, k) in persons" :key="k">
+                {{val.name}}--{{val.age}}
+            </li>
+        </ul>
+    </div>
+    <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                persons:[
+                    {'name':'wy', 'age':20},    
+                    {'name':'wm', 'age':16},
+                    {'name':'xx', 'age':10},
+                ]
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+### Key作用
+
+![image-20220806123457645](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220806123459.png)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>列表过滤</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <input type="text" v-model="keyword">
+        <ul>
+            <li v-for="(val, k) in persons_fill" :key="k">
+                {{val.name}}--{{val.age}}
+            </li>
+        </ul>
+    </div>
+    <script type="text/javascript">
+        // const vm = new Vue({
+        //     el:'#root',
+        //     data:{
+        //         keyword:'',
+        //         persons:[
+        //             {'name':'wyy', 'age':20},    
+        //             {'name':'wmx', 'age':16},
+        //             {'name':'xxw', 'age':10},
+        //             {'name':'adsf', 'age':20},    
+        //             {'name':'vcx', 'age':16},
+        //             {'name':'xwe', 'age':10},
+        //             {'name':'wyy', 'age':20},    
+        //             {'name':'wmx', 'age':16},
+        //             {'name':'xxw', 'age':10},
+        //             {'name':'adsf', 'age':20},    
+        //             {'name':'vcx', 'age':16},
+        //             {'name':'xwe', 'age':10},
+        //         ],
+        //         persons_fill:[
+
+        //         ]
+        //     },
+        //     watch:{
+        //         keyword:{
+        //             immediate:true,
+        //             handler(val){
+        //                 this.persons_fill = this.persons.filter((p)=>{
+        //                     return p.name.indexOf(val) !== -1
+        //                 })
+        //             }
+                    
+        //         }
+        //     }
+        // })
+        
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                keyword:'',
+                persons:[
+                    {'name':'wyy', 'age':20},    
+                    {'name':'wmx', 'age':16},
+                    {'name':'xxw', 'age':10},
+                    {'name':'adsf', 'age':20},    
+                    {'name':'vcx', 'age':16},
+                    {'name':'xwe', 'age':10},
+                    {'name':'wyy', 'age':20},    
+                    {'name':'wmx', 'age':16},
+                    {'name':'xxw', 'age':10},
+                    {'name':'adsf', 'age':20},    
+                    {'name':'vcx', 'age':16},
+                    {'name':'xwe', 'age':10},
+                ],
+            },
+            computed:{
+                persons_fill(){
+                    return this.persons.filter((p)=>{
+                        return p.name.indexOf(this.keyword) !== -1
+                    })
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+![image-20220806131131980](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220806131133.png)
 
 ## 待更新...
 

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>列表过滤</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <input type="text" v-model="keyword">
+        <ul>
+            <li v-for="(val, k) in persons_fill" :key="k">
+                {{val.name}}--{{val.age}}
+            </li>
+        </ul>
+    </div>
+    <script type="text/javascript">
+        // const vm = new Vue({
+        //     el:'#root',
+        //     data:{
+        //         keyword:'',
+        //         persons:[
+        //             {'name':'wyy', 'age':20},    
+        //             {'name':'wmx', 'age':16},
+        //             {'name':'xxw', 'age':10},
+        //             {'name':'adsf', 'age':20},    
+        //             {'name':'vcx', 'age':16},
+        //             {'name':'xwe', 'age':10},
+        //             {'name':'wyy', 'age':20},    
+        //             {'name':'wmx', 'age':16},
+        //             {'name':'xxw', 'age':10},
+        //             {'name':'adsf', 'age':20},    
+        //             {'name':'vcx', 'age':16},
+        //             {'name':'xwe', 'age':10},
+        //         ],
+        //         persons_fill:[
+
+        //         ]
+        //     },
+        //     watch:{
+        //         keyword:{
+        //             immediate:true,
+        //             handler(val){
+        //                 this.persons_fill = this.persons.filter((p)=>{
+        //                     return p.name.indexOf(val) !== -1
+        //                 })
+        //             }
+                    
+        //         }
+        //     }
+        // })
+        
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                keyword:'',
+                persons:[
+                    {'name':'wyy', 'age':20},    
+                    {'name':'wmx', 'age':16},
+                    {'name':'xxw', 'age':10},
+                    {'name':'adsf', 'age':20},    
+                    {'name':'vcx', 'age':16},
+                    {'name':'xwe', 'age':10},
+                    {'name':'wyy', 'age':20},    
+                    {'name':'wmx', 'age':16},
+                    {'name':'xxw', 'age':10},
+                    {'name':'adsf', 'age':20},    
+                    {'name':'vcx', 'age':16},
+                    {'name':'xwe', 'age':10},
+                ],
+            },
+            computed:{
+                persons_fill(){
+                    return this.persons.filter((p)=>{
+                        return p.name.indexOf(this.keyword) !== -1
+                    })
+                }
+            }
+        })
+    </script>
+</body>
+</html>
