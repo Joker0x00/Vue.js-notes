@@ -952,6 +952,8 @@ style中也可以写 **数组**，但不常用
 
 ![image-20220806123457645](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220806123459.png)
 
+### 列表过滤
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -1039,7 +1041,346 @@ style中也可以写 **数组**，但不常用
 </html>
 ```
 
+**测试结果：**
+
 ![image-20220806131131980](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220806131133.png)
+
+​	
+
+### 列表排序
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>列表排序</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h1>人员列表</h1>
+        <input type="text" v-model="keyword">
+        <button @click="sortType = 1">升序</button>
+        <button @click="sortType = 2">降序</button>
+        <button @click="sortType = 0">原序</button>
+
+        <ul>
+            <li v-for="(val, k) in persons_fill" :key="k">
+                {{val.name}}--{{val.age}}
+            </li>
+        </ul>
+    </div>
+    <script type="text/javascript">
+        
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                keyword:'',
+                sortType:0,
+                persons:[
+                    {'name':'wyy', 'age':20},    
+                    {'name':'wmx', 'age':16},
+                    {'name':'xxw', 'age':10},
+                    {'name':'adsf', 'age':20},    
+                    {'name':'vcx', 'age':16},
+                    {'name':'xwe', 'age':10},
+                    {'name':'wyy', 'age':20},    
+                    {'name':'wmx', 'age':16},
+                    {'name':'xxw', 'age':10},
+                    {'name':'adsf', 'age':20},    
+                    {'name':'vcx', 'age':16},
+                    {'name':'xwe', 'age':10},
+                ],
+            },
+            computed:{
+                persons_fill(){
+                    const a = this.persons.filter((p)=>{
+                        return p.name.indexOf(this.keyword) !== -1
+                    })
+
+                    if (this.sortType)
+                    {
+                        a.sort((a, b)=>{
+                            return this.sortType === 1 ? a.age - b.age : b.age - a.age;
+                        })
+                    }
+                    return a;
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+**测试结果：**
+
+![image-20220807093103341](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220807093105.png)
+
+
+
+**升序和降序**
+
+![image-20220807093203721](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220807093205.png)
+
+![image-20220807093210080](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220807093211.png)
+
+### 模拟Vue进行数据监测（对象）
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模拟数据监测</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+    </div>
+    <script type="text/javascript">
+        
+        let data = {
+            name:'wy',
+            age:23,
+        }
+        // 创建一个监视的实例对象，用于监视data中属性的变化
+        const obs = new Observer(data)
+
+        let vm = {}
+        vm._data = data = obs
+
+        function Observer(obj) {
+            const keys = Object.keys(obj)
+            // 汇总对象中所有属性形成一个数组
+            keys.forEach((k)=>{
+                Object.defineProperty(this, k, {
+                    get(){
+                        return obj[k]
+                    },
+
+                    set(val){
+                        obj[k] = val
+                    }
+                })
+            })
+        }
+    </script>
+</body>
+</html>
+```
+
+**测试结果**
+
+![image-20220807101633970](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220807101635.png)
+
+
+
+### Vue.set使用
+
+向 `Vue` 中添加属性
+
+**注意：`tartget` 不能为 `vm` 本身或者 `vm._data`** 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue.set使用</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h1>name: {{name}}</h1>
+        <h1>age: {{age}}</h1>
+        <h2>school</h2>
+        <h3>name: {{school.name}}</h3>
+        <h3 v-if="school.loc">loc: {{school.loc}}</h3>
+    </div>
+    <script type="text/javascript">
+        
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                name:'wy',
+                age:18,
+                school:{
+                    name:'zzu',
+                }
+            }
+        })
+        
+    </script>
+</body>
+</html>
+```
+
+方式一：
+
+```js
+Vue.set(vm.school, 'loc', 'zz')
+```
+
+方式二：
+
+```js
+vm.$set(vm.school, 'loc', 'zz')
+```
+
+执行结果：
+
+![image-20220807103941825](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220807103943.png)
+
+
+
+### Vue监测数组
+
+![image-20220807114034420](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220807114036.png)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模拟数据监测数组</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h1>爱好</h1>
+        <ul>
+            <li v-for="(val, k) in hobby" :key="k">
+                {{val}}
+            </li>
+        </ul>
+    </div>
+    <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                hobby:['听音乐', '打游戏', '唱歌', '跑步']
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+数组中的元素没有 `getter` 和 `setter` 方法
+
+![image-20220807113100914](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220807113102.png)
+
+直接使用数组下标对其修改在页面上不会体现效果
+
+```js
+vm._data.hobby[0] = '睡觉'
+```
+
+`Vue` 将被侦听的数组的变更方法进行了包裹，所以它们也将会触发视图更新。这些被包裹过的方法包括：
+
+- `push()`
+
+- `pop()`
+
+- `shift()`
+
+- `unshift()`
+
+- `splice()`
+
+  ```js
+  vm.hobby.splice(0, 1, '吃饭')
+  ```
+
+- `sort()`
+
+- `reverse()`
+
+
+
+## 收集表单数据
+
+
+
+![image-20220807115903853](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220807115905.png)
+
+实例
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收集表单数据</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root" @submit.prevent="submit">
+        <form>
+            <div>
+                账户: <input type="text" v-model.trim="userinfo.username">
+            </div>
+            <div>
+                密码: <input type="password" v-model="userinfo.password">
+            </div>
+            <div>
+                性别: 男<input type="radio" name="sex" v-model="userinfo.sex" value="male">女<input type="radio" name="sex" v-model="userinfo.sex" value="female">
+            </div>
+            <div>
+                年龄: <input type="number" v-model.number="userinfo.age">
+            </div>
+            <div>
+                爱好:
+                <input type="checkbox" v-model="userinfo.hobby" value="eat">吃饭
+                <input type="checkbox" v-model="userinfo.hobby" value="sleep">睡觉
+                <input type="checkbox" v-model="userinfo.hobby" value="drink">喝酒
+                <input type="checkbox" v-model="userinfo.hobby" value="gameing">打游戏
+            </div>
+            <div>
+                其他: <textarea name="" id="" cols="30" rows="10" v-model.lazy="userinfo.other"></textarea>
+            </div>
+            <button>提交</button>
+        </form>
+    </div>
+    <script type="text/javascript">
+        
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                userinfo:{
+                    username:'',
+                    password:'',
+                    sex:'',
+                    age:'',
+                    hobby:[],
+                    other:'',
+                }
+            },
+            methods: {
+                submit(){
+                    console.log(JSON.stringify(this.userinfo));
+                }
+            },
+        })
+        
+    </script>
+</body>
+</html>
+```
+
+
 
 ## 待更新...
 
@@ -1047,3 +1388,11 @@ style中也可以写 **数组**，但不常用
 
 > 尚硅谷Vue2.0+Vue3.0全套教程丨vuejs从入门到精通
 > https://www.bilibili.com/video/BV1Zy4y1K7SH?p=15&share_source=copy_web&vd_source=d3c9ceb0642f45fbe95f795c0d074040
+>
+> Vue 官方文档
+>
+> https://cn.vuejs.org/v2/guide/
+>
+> Vue api 文档
+>
+> https://cn.vuejs.org/v2/api/
