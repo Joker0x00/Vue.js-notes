@@ -542,7 +542,7 @@ computed:{
 }
 ```
 
-## 监视属性
+## 1.8 监视属性
 
 1. 当被监视的属性变化时，回调函数自动调用，进行相关操作
 2. 监视的属性必须存在，才能进行监视
@@ -706,7 +706,7 @@ watch:{
 
 
 
-## 绑定class和style
+## 1.9 绑定class和style
 
 ### class
 
@@ -855,7 +855,7 @@ style中也可以写 **数组**，但不常用
 
 
 
-## 条件渲染
+## 1.10 条件渲染
 
 1. `v-if` 
    * 写法： 
@@ -904,7 +904,7 @@ style中也可以写 **数组**，但不常用
 
 
 
-## 列表渲染
+## 1.11 列表渲染
 
 `v-for` 指令
 
@@ -1308,7 +1308,7 @@ vm._data.hobby[0] = '睡觉'
 
 
 
-## 收集表单数据
+## 1.12 收集表单数据
 
 
 
@@ -1375,6 +1375,293 @@ vm._data.hobby[0] = '睡觉'
             },
         })
         
+    </script>
+</body>
+</html>
+```
+
+## 1.13 过滤器
+
+**定义：**对要显示的数据进行特定格式化后再显示（适用于一些简单逻辑的处理）
+
+**语法：**
+
+1. 注册过滤器：`Vue.filter(name, callback) 或 new Vue{filters:{}}`
+2. 使用过滤器：`{{ xxx | 过滤器名 }} 或 v-bind:属性 = "xxx | 过滤器名"`
+
+**备注：**
+
+1.  过滤器也可以接收额外参数、多个过滤器也可以串联
+2. 并没有改变原本的数据，是产生新的对应数据
+
+**实例：**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>过滤器</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h1>显示当前日期和时间</h1>
+        <h2>{{ time | getTime }}</h2>
+        <h1>显示时间</h1>
+        <h2>{{ time | getTime('HH:mm:ss') }}</h2>
+        <h1>属性绑定</h1>
+        <h2 :x="time | getTime">你好</h2>
+        <h1>截取前4位</h1>
+        <h2>{{ time | getTime | slice(0, 4) }}</h2>
+    </div>
+    <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                time:1659925371764
+            },
+            methods:{
+                
+            },
+            filters:{
+                getTime(value, str='YYYY年MM月DD日 HH:mm:ss'){
+                    return dayjs(value).format(str)
+                },
+                slice(str, st=0, ed=0) {
+                    return str.slice(st, ed)
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+**全局注册**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>过滤器</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h1>显示当前日期和时间</h1>
+        <h2>{{ time | getTime | slice(0, 4) }}</h2>
+        <h1>显示时间</h1>
+        <h2>{{ time | getTime('HH:mm:ss') }}</h2>
+        <h1>属性绑定</h1>
+        <h2 :x="time | getTime">你好</h2>
+        <h1>截取前4位</h1>
+        <h2>{{ time | getTime | slice(0, 4) }}</h2>
+    </div>
+
+    <script type="text/javascript">
+        Vue.filter('getTime', function(value, str='YYYY年MM月DD日 HH:mm:ss'){
+            return dayjs(value).format(str)
+        })
+        Vue.filter('slice', function(str, st=0, ed=0){
+            return str.slice(st, ed)
+        })
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                time:1659925371764
+            },
+            methods:{
+                
+            },
+
+        })
+    </script>
+</body>
+</html>
+```
+
+![image-20220808103707923](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220808103709.png)
+
+
+
+## 1.14 内置指令
+
+### v-text
+
+1. 作用：向其所在节点中渲染文本内容
+2. 与插值语法的区别：`v-text` 会替换掉节点的内容，`{{xx}}` 不会
+
+### v-html
+
+1. 作用:向指定节点中渲染包含html结构的内容
+2. 与插值语法的区别：
+   1. `v-html` 会替换掉节点中所有内容，`{{xxx}}` 不会
+   2. `v-html` 可以识别为html结构
+3. 严重注意：`v-html` 有安全性问题
+   1. 在网站上动态渲染任意 html 是非常危险的，容易导致 XSS 攻击
+   2. 一定在可信的内容上使用 `v-html` ，永远不要用在用户提交的内容上
+
+### v-cloak
+
+1. 本质是一个特殊的属性，Vue实例创建完毕并接管容器后，会删掉 `v-cloak` 属性
+2. 使用 css 配合 `v-cloak` 可以解决网速慢时页面展示出 `{{xxx}}` 的问题
+
+**实例**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v-cloak</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+    <style>
+        [v-cloak]{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <h1 v-cloak>{{name}}</h1>
+    </div>
+
+
+    <script type="text/javascript">
+        Vue.filter('getTime', function(value, str='YYYY年MM月DD日 HH:mm:ss'){
+            return dayjs(value).format(str)
+        })
+        Vue.filter('slice', function(str, st=0, ed=0){
+            return str.slice(st, ed)
+        })
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                name:'张三'
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+### v-once
+
+1. `v-once` 所在节点在初次动态渲染后，就视为静态内容了
+2. 以后数据的改变不会引起 `v-once` 所在结构的更新，可以用于优化性能
+
+### v-pre
+
+1. 跳过其所在节点的编译过程
+2. 可利用它跳过节点：没有使用指令语法、没有使用插值语法的节点，加快编译
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v-cloak</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+
+</head>
+<body>
+    <div id="root">
+        <h1 v-pre @click="name += '1'">{{name}}</h1>
+    </div>
+    <script type="text/javascript">
+        Vue.filter('getTime', function(value, str='YYYY年MM月DD日 HH:mm:ss'){
+            return dayjs(value).format(str)
+        })
+        Vue.filter('slice', function(str, st=0, ed=0){
+            return str.slice(st, ed)
+        })
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                name:'张三'
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+## 1.15 自定义指令
+
+![image-20220808125006778](https://gitee.com/ahaccmt/cloud-notes-typora/raw/master/typora-images/20220808125008.png)
+
+注意自定义命令中的 `this` 是 Windows
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义指令</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+
+</head>
+<body>
+
+    <div id="root">
+        <h1>{{n}}</h1>
+        <button @click="n++">点击</button>
+        <input type="nubmer" v-fbind="n">
+    </div>
+
+
+    <script type="text/javascript">
+        Vue.filter('getTime', function(value, str='YYYY年MM月DD日 HH:mm:ss'){
+            return dayjs(value).format(str)
+        })
+        Vue.filter('slice', function(str, st=0, ed=0){
+            return str.slice(st, ed)
+        })
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                n:1,
+            },
+            directives:{
+                // fbind(element, binding){
+                //     console.log(element, binding);
+                //     element.value = binding.value;
+                //     element.focus() // 在第一次绑定时，还没有将所在元素插入页面中，因此不会生效
+                // }
+
+                fbind:{
+                    bind(elem, binding){
+                        console.log('bind');
+                        elem.value = binding.value
+                    },
+                    inserted(elem, binding){
+                        console.log('inserted');
+                        elem.focus()
+                    },
+                    update(elem, binding){
+                        console.log('update');
+                        elem.value = binding.value
+                    }
+                }
+            }
+        })
     </script>
 </body>
 </html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>过滤器</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h1>显示当前日期和时间</h1>
+        <h2>{{ time | getTime | slice(0, 4) }}</h2>
+        <h1>显示时间</h1>
+        <h2>{{ time | getTime('HH:mm:ss') }}</h2>
+        <h1>属性绑定</h1>
+        <h2 :x="time | getTime">你好</h2>
+        <h1>截取前4位</h1>
+        <h2>{{ time | getTime | slice(0, 4) }}</h2>
+    </div>
+    <!-- <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                time:1659925371764
+            },
+            methods:{
+                
+            },
+            filters:{
+                getTime(value, str='YYYY年MM月DD日 HH:mm:ss'){
+                    return dayjs(value).format(str)
+                },
+                slice(str, st=0, ed=0) {
+                    return str.slice(st, ed)
+                }
+            }
+        })
+    </script> -->
+
+    <script type="text/javascript">
+        Vue.filter('getTime', function(value, str='YYYY年MM月DD日 HH:mm:ss'){
+            return dayjs(value).format(str)
+        })
+        Vue.filter('slice', function(str, st=0, ed=0){
+            return str.slice(st, ed)
+        })
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                time:1659925371764
+            },
+            methods:{
+                
+            },
+
+        })
+    </script>
+</body>
+</html>

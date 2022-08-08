@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义指令</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+
+</head>
+<body>
+
+    <div id="root">
+        <h1>{{n}}</h1>
+        <button @click="n++">点击</button>
+        <input type="nubmer" v-fbind="n">
+    </div>
+
+
+    <script type="text/javascript">
+        Vue.filter('getTime', function(value, str='YYYY年MM月DD日 HH:mm:ss'){
+            return dayjs(value).format(str)
+        })
+        Vue.filter('slice', function(str, st=0, ed=0){
+            return str.slice(st, ed)
+        })
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                n:1,
+            },
+            directives:{
+                // fbind(element, binding){
+                //     console.log(element, binding);
+                //     element.value = binding.value;
+                //     element.focus() // 在第一次绑定时，还没有将所在元素插入页面中，因此不会生效
+                // }
+
+                fbind:{
+                    bind(elem, binding){
+                        console.log('bind');
+                        elem.value = binding.value
+                    },
+                    inserted(elem, binding){
+                        console.log('inserted');
+                        elem.focus()
+                    },
+                    update(elem, binding){
+                        console.log('update');
+                        elem.value = binding.value
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>

