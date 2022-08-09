@@ -1392,7 +1392,7 @@ vm._data.hobby[0] = '睡觉'
 **备注：**
 
 1.  过滤器也可以接收额外参数、多个过滤器也可以串联
-2. 并没有改变原本的数据，是产生新的对应数据
+2.  并没有改变原本的数据，是产生新的对应数据
 
 **实例：**
 
@@ -1669,7 +1669,138 @@ vm._data.hobby[0] = '睡觉'
 
 
 
-## 待更新...
+
+
+
+
+## 1.16 生命周期
+
+1. 又名：生命周期回调函数、生命周期函数，生命周期钩子
+2. 是什么：Vue 在关键时期帮我们调用的一些特殊函数
+3. 生命周期函数的名字不可更改，但函数的具体内容是程序员根据需求编写的
+4. 生命周期函数中的 `this` 指向的是 vm 或组件实例对象
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生命周期</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生命周期</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+
+</head>
+<body>
+    <div id="root">
+        <h1 :style="{opacity}">Hello, World!</h1>
+    </div>
+    <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                opacity:1
+            },
+            mounted() {
+                setInterval(()=>{
+                    this.opacity -= 0.01
+                    if (this.opacity <= 0) this.opacity = 1
+                }, 16)
+            },
+        })
+    </script>
+</body>
+</html>
+```
+
+
+
+常用的生命周期钩子：
+
+1. mounted: 发送 ajax请求、启动定时器、绑定自定义事件、订阅消息等【初始化操作】
+2. beforeDestroy: 清除定时器、解绑自定义事件取消订阅消息等【收尾工作】
+
+关于销毁 Vue 实例
+
+1. 销毁后借助 Vue 开发工具看不到任何信息
+2. 销毁后自定义事件会失败，但原生DOM事件依然有效
+3. 一般不会在 beforedestroy操作数据，因为即便操作数据，也不会触发更新流程了
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生命周期</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+
+</head>
+<body>
+    <div id="root">
+        <h1 :style="{opacity}">Hello, World!</h1>
+        <button @click="hack">点击销毁vm实例</button>
+    </div>
+    <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                opacity:1
+            },
+            methods: {
+                hack(){
+                    this.$destroy()
+                }
+            },
+            beforeCreate() {
+                console.log('beforeCreate');
+            },
+            created() {
+                console.log('created');
+            },
+            beforeMount() {
+                console.log('beforeMount');
+            },
+            mounted() {
+                console.log('mounted');
+                setInterval(()=>{
+                    this.opacity -= 0.01
+                    if (this.opacity <= 0) this.opacity = 1
+                }, 16)
+            },
+            beforeUpdate() {
+                console.log('beforeUpdate')
+            },
+            updated() {
+                console.log('updated');            
+            },
+            beforeDestroy() {
+                console.log('beforeDestroy');
+            },
+            destroyed() {
+                console.log('destroyed');
+            },
+        })
+    </script>
+</body>
+</html>
+```
 
 ## 参考资料
 
@@ -1683,3 +1814,4 @@ vm._data.hobby[0] = '睡觉'
 > Vue api 文档
 >
 > https://cn.vuejs.org/v2/api/
+

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命名的注意点</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+
+</head>
+<body>
+    <div id="root">
+        <!-- 注册时写什么名字，这里用的时候就写什么名字 -->
+        <my-school></my-school> 
+        <student></student>
+        <hello></hello>
+    </div>
+    <script type="text/javascript">
+        const school = {
+            template:`
+                <div>
+                    <h1>{{name}}</h1>
+                    <h1>{{loc}}</h1>
+                </div>
+            `,
+            data(){
+                return {
+                    name:'AAA',
+                    loc:'BBB',
+                }
+            }
+        }
+        const student = Vue.extend({
+            name:'Wanger', // 在Vue开发者工具显示的名字，如不定义，就显示注册的名字
+            data(){
+                return {
+                    name:'王二',
+                    age:18
+                }
+            },
+            template:`
+                <div>
+                    <h1>{{name}}</h1>
+                    <h1>{{age}}</h1>
+                </div>
+            `,
+        })
+
+        const hello = Vue.extend({
+            data(){
+                return {
+                    name:'王二',
+                }
+            },
+            template:`
+                <div>
+                    <h1>hello, {{name}}</h1>
+                </div>
+            `,
+        })
+        // 注册为全局组件
+        Vue.component('hello', hello)
+        const vm = new Vue({
+            el:'#root',
+            // 配置局部组件
+            components:{
+                'my-school':school,
+                student
+            }
+        })
+    </script>
+</body>
+</html>

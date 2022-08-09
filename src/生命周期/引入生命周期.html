@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生命周期</title>
+    <script type="text/javascript" src="../js/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.4/dayjs.min.js"></script>
+
+</head>
+<body>
+    <div id="root">
+        <h1 :style="{opacity}">Hello, World!</h1>
+        <button @click="hack">点击销毁vm实例</button>
+    </div>
+    <script type="text/javascript">
+        const vm = new Vue({
+            el:'#root',
+            data:{
+                opacity:1
+            },
+            methods: {
+                hack(){
+                    this.$destroy()
+                }
+            },
+            beforeCreate() {
+                console.log('beforeCreate');
+            },
+            created() {
+                console.log('created');
+            },
+            beforeMount() {
+                console.log('beforeMount');
+            },
+            mounted() {
+                console.log('mounted');
+                setInterval(()=>{
+                    this.opacity -= 0.01
+                    if (this.opacity <= 0) this.opacity = 1
+                }, 16)
+            },
+            beforeUpdate() {
+                console.log('beforeUpdate')
+            },
+            updated() {
+                console.log('updated');            
+            },
+            beforeDestroy() {
+                console.log('beforeDestroy');
+            },
+            destroyed() {
+                console.log('destroyed');
+            },
+        })
+    </script>
+</body>
+</html>
